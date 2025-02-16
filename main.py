@@ -17,14 +17,17 @@ import boto3
 from botocore.exceptions import ClientError
 
 # Set up the DynamoDB client using environment variables
-aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-aws_region = os.environ.get('AWS_REGION', 'ap-south-1')
-
-dynamodb = boto3.resource('dynamodb',
-                          region_name=aws_region,
-                          aws_access_key_id=aws_access_key_id,
-                          aws_secret_access_key=aws_secret_access_key)
+try:
+    aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+    aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    aws_region = os.environ.get('AWS_REGION', 'ap-south-1')
+    
+    dynamodb = boto3.resource('dynamodb',
+                              region_name=aws_region,
+                              aws_access_key_id=aws_access_key_id,
+                              aws_secret_access_key=aws_secret_access_key)
+except:
+    pass
 
 def upload_item_to_dynamodb(table_name, item):
     table = dynamodb.Table(table_name)
@@ -170,7 +173,10 @@ def main():
                         'response': analysis.split('</think>')[1]
                     }
 
-                    upload_item_to_dynamodb(table_name, item)
+                    try:
+                        upload_item_to_dynamodb(table_name, item)
+                    except:
+                        pass
 
                     if analysis:
                         st.markdown(f"""<div class="analysis-box-think"><h2>Thinking</h2>{analysis.split('</think>')[0]}</div> 
